@@ -1,171 +1,121 @@
-RAG-Based AI Literature Review System
+# RAG-Based AI Literature Review System
 
-Overview
+## Overview
+This project builds a local, reproducible AI research assistant using a Retrieval-Augmented Generation (RAG) pipeline. It enables semantic search over a curated library of academic PDFs, then supports grounded literature reviews, research gaps, and testable hypotheses using an LLM — while keeping citations accurate through Zotero.
 
-This project implements a local, reproducible AI research assistant using a Retrieval-Augmented Generation (RAG) pipeline. The system enables semantic search over a curated set of academic papers and generates grounded literature reviews, research gaps, and testable hypotheses using large language models (LLMs), while ensuring citation accuracy and academic integrity.
+## Core Principles
+- Reproducibility: Outputs trace back to a fixed set of local PDFs.
+- Citation discipline: Zotero is the source of truth for references.
+- No hallucinations: LLM outputs are constrained to retrieved papers.
+- Scalability: Works from a handful of papers to 1,000+.
 
-This tool is designed for repeated use throughout the seminar and doctoral training, including literature reviews, proposal development, and dissertation research.
-
-⸻
-
-Core Principles
-	•	Reproducibility: All outputs are traceable to a fixed set of local PDFs.
-	•	Citation Discipline: Zotero serves as the single source of truth for references.
-	•	No Hallucinations: LLMs are restricted to content retrieved via RAG.
-	•	Scalability: The system scales from a few papers to thousands.
-
-⸻
-
-Project Structure
-
-RAG_LitReview_Seminar/
-│
+## Project Structure
+```
+RAG_Literature_Review_Investments_Seminar/
 ├── README.md
-│
-├── venv/                      # Python virtual environment (local)
-│
 ├── data/
 │   ├── zotero_library/        # PDFs copied from Zotero
 │   └── query_outputs/         # PDFs selected by RAG
-│
 ├── rag/
-│   ├── build_index.py         # Builds semantic index (ChromaDB)
-│   ├── query.py               # Queries index and retrieves PDFs
+│   ├── build_index.py         # Build semantic index (ChromaDB)
+│   ├── query.py               # Query index and retrieve PDFs
 │   ├── requirements.txt       # Python dependencies
 │   └── chroma_db/             # Vector database (auto-generated)
-│
 ├── zotero/
-│   └── zotero_to_csv.py       # Exports citation log from Zotero
-│
+│   ├── zotero_to_csv.py       # Normalize Zotero CSV export
+│   └── zotero_export.csv      # (User-provided export from Zotero)
 ├── outputs/
 │   ├── literature_review.pdf
 │   ├── research_gaps.pdf
 │   ├── hypotheses.pdf
 │   └── zotero_paper_map.csv
-│
 └── logs/
-    └── run_notes.md           # Optional execution notes
+    └── run_notes.md
+```
 
+## Requirements
+- Python 3.9+
+- Zotero (desktop + browser connector)
+- ChatGPT or Claude for analysis step
 
-⸻
+## Setup (Matches Assignment Steps)
 
-Requirements
-	•	Python 3.9+
-	•	VS Code (recommended)
-	•	Zotero (desktop + browser connector)
-	•	ChatGPT or Claude (for analysis step)
+### 1) Prepare Zotero
+1. Create a Zotero collection named **Seminar Readings**.
+2. Add all assigned papers and attach PDFs.
 
-⸻
-
-Setup Instructions
-
-1. Create and Activate Virtual Environment
-
-From the project root:
-
-python3 -m venv venv
-source venv/bin/activate   # Mac/Linux
-# venv\\Scripts\\activate    # Windows
-
-
-⸻
-
-2. Install Dependencies
-
-pip install -r rag/requirements.txt
-
-
-⸻
-
-3. Prepare Zotero PDFs
-	•	Create a Zotero collection named Seminar Readings
-	•	Ensure each entry has:
-	•	Author(s)
-	•	Year
-	•	Title
-	•	Attached PDF
-	•	Copy PDFs into:
-
+### 2) Copy PDFs to Local Folder
+Copy the PDFs into:
+```
 data/zotero_library/
+```
 
+### 3) Create and Activate a Virtual Environment
+```
+python3 -m venv venv
+source venv/bin/activate
+```
 
-⸻
+### 4) Install Dependencies
+```
+pip install -r rag/requirements.txt
+```
 
-4. Build Semantic Index
-
+### 5) Build the Semantic Index
+```
 python rag/build_index.py
+```
+This creates embeddings and stores them in `rag/chroma_db/`.
 
-This creates embeddings and stores them in rag/chroma_db/.
-
-⸻
-
-5. Run a Semantic Query
-
+### 6) Run a Query
+```
 python rag/query.py
-
+```
 You will be prompted for:
-	•	Research question
-	•	top_k (recommended: 8–12)
-	•	min_score (recommended: 0.4–0.6)
+- Research question
+- `top_k` (recommended: 8–12)
+- `min_score` (recommended: 0.4–0.6)
 
-Relevant PDFs will be copied into:
-
+RAG copies the most relevant PDFs into:
+```
 data/query_outputs/
+```
 
+### 7) LLM Analysis (Strict Mode)
+Upload only the PDFs from `data/query_outputs/` and generate:
+- Literature review
+- Research gaps
+- Hypotheses
 
-⸻
-
-6. LLM Analysis (Strict Mode)
-
-Upload only the PDFs from data/query_outputs/ to the LLM.
-
-Generate:
-	•	Literature review
-	•	Research gaps
-	•	Hypotheses
-
-Save outputs as PDFs in:
-
+Save results to:
+```
 outputs/
+```
 
-LLMs must not reference any source outside the uploaded PDFs.
-
-⸻
-
-7. Export Citation Log
-
+### 8) Export Zotero Citation Log
+1. In Zotero, export your library/collection to CSV.
+2. Save it as:
+```
+zotero/zotero_export.csv
+```
+3. Run:
+```
 python zotero/zotero_to_csv.py
-
-Move the generated CSV to:
-
+```
+This produces:
+```
 outputs/zotero_paper_map.csv
+```
 
+## Submission Checklist
+- Research question(s)
+- Folder of RAG-selected PDFs (`data/query_outputs/`)
+- Literature review PDF
+- Research gaps PDF
+- Hypotheses PDF
+- Zotero citation log (`outputs/zotero_paper_map.csv`)
 
-⸻
-
-Final Submission Checklist
-	•	Research question(s)
-	•	Folder of RAG-selected PDFs
-	•	Literature review PDF
-	•	Research gaps PDF
-	•	Hypotheses PDF
-	•	Zotero citation log (CSV)
-
-⸻
-
-Notes
-	•	Zotero is the source of truth for all citations.
-	•	If a citation cannot be verified in Zotero, it must be corrected or removed.
-	•	This system is intentionally script-based to ensure full reproducibility.
-
-⸻
-
-Intended Use Beyond This Assignment
-
-This workflow is designed to be reused for:
-	•	Group projects
-	•	Seminar papers
-	•	Dissertation literature reviews
-	•	Collaborative research
-
-Once built, it becomes a long-term research asset rather than a one-off assignment.
+## Notes
+- Verify every citation against Zotero before submission.
+- If a citation is missing or incorrect, fix it using Zotero metadata.
+- Keep all outputs grounded in the retrieved PDFs only.
